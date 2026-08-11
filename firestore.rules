@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Validation Blueprints ---
+    
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    function isValidUser(data) {
+      return data.uid == request.auth.uid
+        && data.email is string
+        && (!('displayName' in data) || data.displayName is string)
+        && (!('theme' in data) || data.theme in ['amoled', 'light', 'dusk'])
+        && (!('favoriteFonts' in data) || data.favoriteFonts is list)
+        && (!('habitGoals' in data) || data.habitGoals is map)
+        && (!('longTermAnalysis' in data) || data.longTermAnalysis is map)
+        && (!('createdAt' in data) || data.createdAt is string)
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && (!('habitsList' in data) || data.habitsList is list)
+        && data.keys().hasAll(['uid', 'email'])
+        && data.keys().size() <= 11;
+    }
+
+    function isValidEntry(data) {
+      return data.userId == request.auth.uid
+        && data.date is string && data.date.size() == 10 // YYYY-MM-DD
+        && data.content is string && data.content.size() <= 100000
+        && (!('title' in data) || (data.title is string && data.title.size() <= 200))
+        && (!('mood' in data) || data.mood is string)
+        && (!('tags' in data) || data.tags is list)
+        && (!('images' in data) || data.images is list)
+        && (!('audio' in data) || data.audio is list)
+        && (!('analysis' in data) || data.analysis is map)
+        && (!('createdAt' in data) || data.createdAt is string)
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && data.keys().hasAll(['userId', 'date', 'content'])
+        && data.keys().size() <= 14;
+    }
+
+    function isValidHabit(data) {
+      return data.userId == request.auth.uid
+        && data.date is string && data.date.size() == 10
+        && data.habitKey is string && data.habitKey.size() <= 50
+        && data.value is int
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && (!('createdAt' in data) || data.createdAt is string)
+        && data.keys().hasAll(['userId', 'date', 'habitKey', 'value'])
+        && data.keys().size() <= 8;
+    }
+
+    function isValidTask(data) {
+      return data.userId == request.auth.uid
+        && data.date is string && data.date.size() == 10
+        && data.text is string && data.text.size() <= 500
+        && (data.done is bool)
+        && (!('importance' in data) || data.importance in ['low', 'medium', 'high', 'urgent'])
+        && (!('time' in data) || data.time is string)
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && (!('createdAt' in data) || data.createdAt is string)
+        && data.keys().hasAll(['userId', 'date', 'text'])
+        && data.keys().size() <= 10;
+    }
+
+    // --- Match Rules ---
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming())
+        && incoming().uid == existing().uid;
+    }
+
+    match /entries/{entryId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(incoming().userId) && isValidEntry(incoming());
+      allow update: if isOwner(existing().userId) && isValidEntry(incoming())
+        && incoming().userId == existing().userId
+        && incoming().date == existing().date
+        && (incoming().diff(existing()).affectedKeys().hasOnly(['title', 'content', 'mood', 'tags', 'images', 'audio', 'analysis', 'updatedAt']));
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /habits/{habitId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(incoming().userId) && isValidHabit(incoming());
+      allow update: if isOwner(existing().userId) && isValidHabit(incoming())
+        && incoming().userId == existing().userId
+        && incoming().date == existing().date
+        && incoming().habitKey == existing().habitKey
+        && (incoming().diff(existing()).affectedKeys().hasOnly(['value', 'updatedAt']));
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /tasks/{taskId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(incoming().userId) && isValidTask(incoming());
+      allow update: if isOwner(existing().userId) && isValidTask(incoming())
+        && incoming().userId == existing().userId
+        && incoming().date == existing().date
+        && (incoming().diff(existing()).affectedKeys().hasOnly(['text', 'done', 'importance', 'time', 'updatedAt']));
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

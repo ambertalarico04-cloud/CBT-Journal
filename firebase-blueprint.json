@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user preferences and basic profile info.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "theme": { "type": "string", "enum": ["amoled", "light", "dusk"] },
+        "favoriteFonts": { "type": "array", "items": { "type": "string" } },
+        "habitsList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "max": { "type": "integer" },
+              "hidden": { "type": "boolean" }
+            },
+            "required": ["key", "label", "max"]
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Entry": {
+      "title": "Journal Entry",
+      "description": "A single daily journal entry with content and metadata.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "mood": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "audio": { "type": "array", "items": { "type": "string" } },
+        "analysis": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "date", "content"]
+    },
+    "Habit": {
+      "title": "Habit Log",
+      "description": "Completion state for a specific habit on a specific day.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "habitKey": { "type": "string" },
+        "value": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "date", "habitKey", "value"]
+    },
+    "Task": {
+      "title": "Daily Task",
+      "description": "An item in the user's daily to-do list.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "text": { "type": "string" },
+        "done": { "type": "boolean" },
+        "importance": { "type": "string", "enum": ["low", "medium", "high"] },
+        "time": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "date", "text"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user profile and settings."
+    },
+    "/entries/{entryId}": {
+      "schema": "Entry",
+      "description": "User journal entries."
+    },
+    "/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Daily habit tracking data."
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "User daily tasks."
+    }
+  }
+}

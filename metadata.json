@@ -1,0 +1,11 @@
+{
+  "name": "Lumina AI Journal",
+  "description": "A sophisticated AI-powered daily planner and psychological journal with rich text editing, habit tracking, and cognitive behavioral analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

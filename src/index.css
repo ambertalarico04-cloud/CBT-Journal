@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Arima:wght@300&family=Bellota:wght@300&family=Comic+Neue:wght@300&family=Playpen+Sans:wght@200&family=Montserrat+Alternates:wght@200&family=Bubbler+One&family=Petit+Formal+Script&family=Handlee&family=Bad+Script&family=Sofia&family=Gabriela&family=Cinzel+Decorative&family=Cormorant+Infant:wght@300&family=Josefin+Slab:wght@300&family=Poiret+One&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poiret One", "Century Gothic", "Apple Gothic", sans-serif;
+  --font-poiret: "Poiret One", "Century Gothic", "Apple Gothic", sans-serif;
+  --font-arima: "Arima", cursive;
+  --font-bellota: "Bellota", cursive;
+  --font-comic: "Comic Neue", cursive;
+  --font-playpen: "Playpen Sans", cursive;
+  --font-montserrat: "Montserrat Alternates", sans-serif;
+  --font-bubbler: "Bubbler One", sans-serif;
+  --font-petit: "Petit Formal Script", cursive;
+  --font-handlee: "Handlee", cursive;
+  --font-badscript: "Bad Script", cursive;
+  --font-sofia: "Sofia", cursive;
+  --font-gabriela: "Gabriela", serif;
+  --font-cinzel: "Cinzel Decorative", cursive;
+  --font-cormorant: "Cormorant Infant", serif;
+  --font-josefin: "Josefin Slab", serif;
+
+  --color-neon-blue: #00ffff;
+  --color-neon-pink: #ff00ff;
+  --color-neon-purple: #bf00ff;
+  --color-neon-blue: var(--neon-blue-color);
+  --color-neon-pink: var(--neon-pink-color);
+  --color-neon-purple: var(--neon-purple-color);
+  --color-baby-blue: var(--baby-blue-color);
+  --color-neon-cyan: var(--neon-cyan-color);
+  --color-lilac: var(--lilac-color);
+}
+
+:root {
+  --neon-blue-color: #00ffff;
+  --neon-pink-color: #ff00ff;
+  --neon-purple-color: #bf00ff;
+  --baby-blue-color: #ffffff;
+  --neon-cyan-color: #00ffff;
+  --lilac-color: #ffffff;
+
+  background-color: #000000;
+  color: var(--color-baby-blue);
+  font-family: var(--font-sans);
+}
+
+html, body {
+  font-family: var(--font-sans);
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+sup {
+  vertical-align: super;
+  font-size: 75%;
+  line-height: 0;
+}
+
+sub {
+  vertical-align: sub;
+  font-size: 75%;
+  line-height: 0;
+}
+
+.theme-amoled {
+  --bg-primary: #050505;
+  --bg-secondary: #0a0a0f;
+  --text-primary: #ffffff;
+  --accent: #00ffff;
+  --border: rgba(0, 255, 255, 0.15);
+
+  --neon-blue-color: #00ffff;
+  --neon-pink-color: #ff00ff;
+  --neon-purple-color: #bf00ff;
+  --baby-blue-color: #e0f2fe;
+  --neon-cyan-color: #00ffff;
+  --lilac-color: #f3e8ff;
+
+  background: radial-gradient(circle at 50% 50%, #0c1020 0%, #030304 100%);
+  color: var(--text-primary);
+}
+
+.theme-light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --text-primary: #0f172a;
+  --accent: #4f46e5;
+  --border: rgba(99, 102, 241, 0.12);
+
+  --neon-blue-color: #2563eb;
+  --neon-pink-color: #db2777;
+  --neon-purple-color: #7c3aed;
+  --baby-blue-color: #1e1b4b;
+  --neon-cyan-color: #0f766e;
+  --lilac-color: #6d28d9;
+
+  background: linear-gradient(135deg, #f5f3ff 0%, #fff1f2 50%, #e0f2fe 100%);
+  color: var(--text-primary);
+}
+
+.theme-dusk {
+  --bg-primary: #0d0005;
+  --bg-secondary: #1a010c;
+  --text-primary: #ffb3c6;
+  --accent: #ff6b9d;
+  --border: rgba(255, 107, 157, 0.2);
+
+  --neon-blue-color: #ff007f;
+  --neon-pink-color: #ff6b9d;
+  --neon-purple-color: #bf00ff;
+  --baby-blue-color: #ffe4e6;
+  --neon-cyan-color: #ff007f;
+  --lilac-color: #ffd3e0;
+
+  background: radial-gradient(circle at 30% 20%, #200213 0%, #060003 100%);
+  color: var(--text-primary);
+}
+
+body {
+  @apply transition-all duration-300;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.glass {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); /* Could parameterize this too */
+}
+
+.neon-glow-blue {
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.neon-glow-pink {
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+}
+
+.neon-glow-purple {
+  text-shadow: 0 0 10px rgba(191, 0, 255, 0.7);
+}
+
+.tab-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+/* Tiptap specific resets */
+.ProseMirror {
+  outline: none;
+  min-height: 200px;
+  white-space: pre-wrap !important;
+}
+
+.ProseMirror img {
+  max-height: 400px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc !important;
+  padding-left: 2rem !important;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal !important;
+  padding-left: 2rem !important;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror li {
+  display: list-item;
+}
+
+.ProseMirror li p {
+  display: inline;
+  margin: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none !important;
+  padding: 0 !important;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex !important;
+  align-items: flex-start;
+}
+
+.ProseMirror ul[data-type="taskList"] li > label {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+hr, .ProseMirror hr {
+  margin: 2.5rem 0;
+  border: none;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--neon-cyan-color) 25%, var(--neon-purple-color) 50%, var(--neon-pink-color) 75%, transparent 100%);
+  clip-path: ellipse(50% 50% at 50% 50%);
+  opacity: 0.95;
+}
+
+/* Light Mode Overrides for Hardcoded Text-White & Dark Classes */
+.theme-light .text-white, 
+.theme-light .text-white\/80, 
+.theme-light .text-white\/60, 
+.theme-light .text-white\/50, 
+.theme-light .text-white\/40, 
+.theme-light .text-white\/20, 
+.theme-light .text-baby-blue, 
+.theme-light .text-baby-blue\/30, 
+.theme-light .text-baby-blue\/40, 
+.theme-light .text-baby-blue\/60,
+.theme-light .text-baby-blue\/70,
+.theme-light .text-baby-blue\/80,
+.theme-light .text-neon-cyan,
+.theme-light .text-neon-purple,
+.theme-light .text-neon-pink {
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.theme-light .ring-neon-cyan,
+.theme-light .ring-neon-pink {
+  ring-color: var(--accent);
+  box-shadow: none !important;
+}
+
+.theme-light .shadow-\[0_0_8px_rgba\(0\,225\,255\,0\.3\)\] {
+  box-shadow: none !important;
+}
+
+.theme-light .text-neon-cyan.font-bold {
+  color: var(--accent);
+}
+
+
+.theme-light .bg-black,
+.theme-light .bg-black\/20,
+.theme-light .bg-black\/40,
+.theme-light .bg-black\/50,
+.theme-light .bg-white\/5,
+.theme-light .bg-white\/10 {
+  background-color: var(--bg-secondary);
+}
+
+.theme-light .border-white\/5,
+.theme-light .border-white\/10,
+.theme-light .border-white\/20,
+.theme-light .border-white\/40,
+.theme-light .border-zinc-800 {
+  border-color: var(--border);
+}
+
+.theme-light option {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-light .neon-glow-blue,
+.theme-light .neon-glow-pink,
+.theme-light .neon-glow-purple {
+  text-shadow: none !important;
+}
+
