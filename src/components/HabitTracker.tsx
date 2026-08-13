@@ -348,15 +348,15 @@ export default function HabitTracker({ date, allHabits, profile, onUpdate }: Hab
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-zinc-950 border border-red-500/30 rounded-3xl p-6 shadow-2xl max-w-lg w-full space-y-6"
+              className={`border rounded-3xl p-6 shadow-2xl max-w-lg w-full space-y-6 ${profile?.theme === 'light' ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-950 border-red-500/30 text-white'}`}
             >
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-red-500/10 rounded-2xl border border-red-500/30 text-red-500 shrink-0">
+                <div className={`p-3 rounded-2xl border shrink-0 ${profile?.theme === 'light' ? 'bg-red-50 border-red-200 text-red-600' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
                   <AlertTriangle size={28} />
                 </div>
                 <div className="space-y-1 flex-grow">
-                  <h3 className="text-xl font-bold uppercase tracking-wider text-red-400 font-poiret">Delete Habit: {habitToDelete.label}</h3>
-                  <p className="text-xs text-baby-blue/60 leading-relaxed">
+                  <h3 className={`text-xl font-bold uppercase tracking-wider font-poiret ${profile?.theme === 'light' ? 'text-red-700' : 'text-red-400'}`}>Delete Habit: {habitToDelete.label}</h3>
+                  <p className={`text-xs leading-relaxed ${profile?.theme === 'light' ? 'text-slate-500' : 'text-baby-blue/60'}`}>
                     You are removing this habit. How would you like to handle your existing historical completion logs for this habit?
                   </p>
                 </div>
@@ -366,10 +366,10 @@ export default function HabitTracker({ date, allHabits, profile, onUpdate }: Hab
                 <button
                   disabled={isDeleting}
                   onClick={() => handleDeleteHabitExecute('hide')}
-                  className="p-4 bg-white/5 border border-white/10 hover:border-neon-cyan/40 hover:bg-neon-cyan/5 rounded-xl text-left transition-all cursor-pointer disabled:opacity-50"
+                  className={`p-4 border rounded-xl text-left transition-all cursor-pointer disabled:opacity-50 ${profile?.theme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50' : 'bg-white/5 border-white/10 hover:border-neon-cyan/40 hover:bg-neon-cyan/5'}`}
                 >
-                  <div className="font-bold text-sm text-neon-cyan uppercase tracking-wider">Keep History & Hide Habit</div>
-                  <div className="text-[11px] text-baby-blue/50 mt-1 leading-relaxed">
+                  <div className={`font-bold text-sm uppercase tracking-wider ${profile?.theme === 'light' ? 'text-teal-700' : 'text-neon-cyan'}`}>Keep History & Hide Habit</div>
+                  <div className={`text-[11px] mt-1 leading-relaxed ${profile?.theme === 'light' ? 'text-slate-500' : 'text-baby-blue/50'}`}>
                     Hides the habit from future daily checklists but keeps all completed logs so historical graphs and matrices remain intact in Analytics. (Recommended)
                   </div>
                 </button>
@@ -377,20 +377,20 @@ export default function HabitTracker({ date, allHabits, profile, onUpdate }: Hab
                 <button
                   disabled={isDeleting}
                   onClick={() => handleDeleteHabitExecute('wipe')}
-                  className="p-4 bg-white/5 border border-white/10 hover:border-red-500/40 hover:bg-red-500/5 rounded-xl text-left transition-all cursor-pointer disabled:opacity-50"
+                  className={`p-4 border rounded-xl text-left transition-all cursor-pointer disabled:opacity-50 ${profile?.theme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-red-500 hover:bg-red-50/50' : 'bg-white/5 border-white/10 hover:border-red-500/40 hover:bg-red-500/5'}`}
                 >
-                  <div className="font-bold text-sm text-red-400 uppercase tracking-wider">Wipe Habit & All History</div>
-                  <div className="text-[11px] text-baby-blue/50 mt-1 leading-relaxed">
+                  <div className={`font-bold text-sm uppercase tracking-wider ${profile?.theme === 'light' ? 'text-red-700' : 'text-red-400'}`}>Wipe Habit & All History</div>
+                  <div className={`text-[11px] mt-1 leading-relaxed ${profile?.theme === 'light' ? 'text-slate-500' : 'text-baby-blue/50'}`}>
                     Completely deletes the habit config and scrubs all daily logs from your profile database. This habit will disappear entirely from all past Analytics.
                   </div>
                 </button>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4">
+              <div className={`flex justify-end gap-3 border-t pt-4 ${profile?.theme === 'light' ? 'border-slate-100' : 'border-white/5'}`}>
                 <button
                   disabled={isDeleting}
                   onClick={() => setHabitToDelete(null)}
-                  className="px-4 py-2 bg-white/5 border border-white/10 text-baby-blue/80 font-bold uppercase tracking-wider text-xs rounded-xl hover:text-white transition-all cursor-pointer"
+                  className={`px-4 py-2 border font-bold uppercase tracking-wider text-xs rounded-xl transition-all cursor-pointer ${profile?.theme === 'light' ? 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200' : 'bg-white/5 border-white/10 text-baby-blue/80 hover:text-white'}`}
                 >
                   Cancel
                 </button>

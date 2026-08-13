@@ -530,7 +530,7 @@ export default function Editor({ content, onChange, onExport, onSave, onDelete, 
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none focus:outline-none min-h-[400px] p-6 tracking-wide whitespace-pre-wrap',
+        class: 'prose prose-invert max-w-none focus:outline-none min-h-[60vh] p-6 tracking-wide whitespace-pre-wrap',
         style: 'font-weight: 200;'
       },
       parseOptions: {

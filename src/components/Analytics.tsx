@@ -20,6 +20,7 @@ interface AnalyticsProps {
 
 export default function Analytics({ entries, habits, profile, onAlert }: AnalyticsProps) {
   const [analyzing, setAnalyzing] = useState(false);
+  const isLight = profile?.theme === 'light';
   
   const habitsConfig = useMemo(() => {
     const list = profile?.habitsList || HABIT_CONFIG;
@@ -243,7 +244,7 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
         {/* Mood Trend Timeline */}
         <div className="glass p-6 rounded-2xl space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold text-neon-pink uppercase tracking-widest border-l-2 border-neon-pink pl-3">
+            <h3 className="text-sm font-bold text-neon-pink uppercase tracking-widest border-l-2 border-neon-pink pl-3 font-poiret text-base">
               Mood Timeline & fluctuations (30d)
             </h3>
             <span className="text-[10px] text-baby-blue/40 uppercase tracking-widest font-mono">Ups & Downs Tracker</span>
@@ -251,19 +252,19 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={moodTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#88888815" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isLight ? "rgba(15, 23, 42, 0.08)" : "#88888815"} vertical={false} />
                 <XAxis 
                   dataKey="date" 
-                  stroke="#ffffff40" 
-                  fontSize={11} 
+                  stroke={isLight ? "rgba(15, 23, 42, 0.15)" : "#ffffff20"} 
+                  tick={{ fill: isLight ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.85)', fontSize: 10, fontWeight: 600 }}
                   tickLine={false} 
                   axisLine={false}
                 />
                 <YAxis 
                   domain={[1, 12]}
                   ticks={[1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12]}
-                  stroke="#ffffff40" 
-                  fontSize={10} 
+                  stroke={isLight ? "rgba(15, 23, 42, 0.15)" : "#ffffff20"} 
+                  tick={{ fill: isLight ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.85)', fontSize: 10, fontWeight: 600 }}
                   tickLine={false} 
                   axisLine={false} 
                   tickFormatter={(score) => {
@@ -289,13 +290,13 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                       if (data.score === null) return null;
                       const emoji = getMoodEmoji(data.mood || '');
                       return (
-                        <div className="bg-black/90 border border-white/10 p-3 rounded-xl shadow-2xl backdrop-blur-md">
-                          <p className="text-[10px] text-baby-blue/40 uppercase tracking-widest font-mono">{data.rawDate}</p>
-                          <p className="text-sm text-white font-medium flex items-center gap-1.5 mt-1">
+                        <div className={`p-3 rounded-xl shadow-2xl backdrop-blur-md border ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-black/90 border-white/10 text-white'}`}>
+                          <p className={`text-[10px] uppercase tracking-widest font-mono ${isLight ? 'text-slate-400' : 'text-baby-blue/40'}`}>{data.rawDate}</p>
+                          <p className={`text-sm font-medium flex items-center gap-1.5 mt-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
                             <span>{emoji}</span>
                             <span>{data.mood}</span>
                           </p>
-                          <p className="text-[10px] text-neon-pink mt-1 uppercase tracking-widest font-bold">Score: {data.score}/12</p>
+                          <p className={`text-[10px] mt-1 uppercase tracking-widest font-bold ${isLight ? 'text-pink-600' : 'text-neon-pink'}`}>Score: {data.score}/12</p>
                         </div>
                       );
                     }
@@ -319,10 +320,10 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
         {/* Habit Completion Matrix (Dot Matrix / Heat Map) */}
         <div className="glass p-6 rounded-2xl space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold text-neon-purple uppercase tracking-widest border-l-2 border-neon-purple pl-3">
+            <h3 className="text-sm font-bold text-neon-purple uppercase tracking-widest border-l-2 border-neon-purple pl-3 font-poiret text-base">
               Daily Goals Completion Matrix (30d)
             </h3>
-            <span className="text-[10px] text-baby-blue/40 uppercase tracking-widest font-mono">Past 30 Days ──► Today</span>
+            <span className="text-[10px] text-baby-blue/40 uppercase tracking-widest font-poiret font-bold">Past 30 Days ──► Today</span>
           </div>
 
           <div className="overflow-x-auto scrollbar-hide pb-2">
@@ -330,7 +331,7 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
               {/* Grid Header Dates */}
               <div className="flex items-center">
                 <div className="w-36 flex-shrink-0" />
-                <div className="flex-1 flex justify-between px-1 text-[9px] uppercase tracking-widest text-baby-blue/30 font-mono">
+                <div className="flex-1 flex justify-between px-1 text-[10px] uppercase tracking-widest text-baby-blue/30 font-poiret font-bold">
                   {(() => {
                     const steps = [0, 7, 14, 21, 29];
                     return steps.map(stepIdx => {
@@ -356,7 +357,7 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                   return (
                     <div key={conf.key} className="flex items-center">
                       {/* Habit Name Column */}
-                      <div className="w-36 flex-shrink-0 text-xs font-mono tracking-wide text-baby-blue/70 truncate pr-3">
+                      <div className="w-36 flex-shrink-0 text-xs font-poiret font-bold uppercase tracking-wider text-baby-blue/70 truncate pr-3">
                         {conf.label}{conf.hidden ? ' (Retired)' : ''}
                       </div>
 
@@ -372,20 +373,22 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                           if (isCompleted) {
                             dotStyle = {
                               backgroundColor: neonColor,
-                              boxShadow: `0 0 10px ${neonColor}, 0 0 4px ${neonColor}`,
+                              boxShadow: isLight ? 'none' : `0 0 10px ${neonColor}, 0 0 4px ${neonColor}`,
                               borderColor: neonColor
                             };
                           } else if (isPartiallyCompleted) {
                             dotStyle = {
                               backgroundColor: `${neonColor}50`,
                               borderColor: neonColor,
-                              borderWidth: '1.5px'
+                              borderWidth: '1.5px',
+                              boxShadow: 'none'
                             };
                           } else {
                             dotStyle = {
-                              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                              borderColor: 'rgba(255, 255, 255, 0.08)',
-                              borderWidth: '1px'
+                              backgroundColor: isLight ? 'rgba(15, 23, 42, 0.04)' : 'rgba(255, 255, 255, 0.02)',
+                              borderColor: isLight ? 'rgba(15, 23, 42, 0.12)' : 'rgba(255, 255, 255, 0.08)',
+                              borderWidth: '1px',
+                              boxShadow: 'none'
                             };
                           }
 
