@@ -4,6 +4,15 @@ import { format, isWithinInterval, parseISO } from 'date-fns';
 import { Search as SearchIcon, Tag, Calendar as CalendarIcon, FileText } from 'lucide-react';
 import { motion } from 'motion/react';
 
+const cleanContentPreview = (content: string) => {
+  if (!content) return "No content";
+  return content
+    .replace(/<[^>]*>/g, '') // Strip HTML tags
+    .replace(/&nbsp;/g, ' ')  // Replace HTML entity non-breaking space
+    .replace(/&nbsp/g, ' ')   // Replace malformed/missing-semicolon entity
+    .trim() || "No content";
+};
+
 interface SearchEntriesProps {
   entries: { [key: string]: JournalEntry };
   onSelectEntry: (date: Date) => void;
@@ -17,18 +26,24 @@ export default function SearchEntries({ entries, onSelectEntry }: SearchEntriesP
 
   const allEntries = Object.values(entries).sort((a, b) => b.date.localeCompare(a.date));
   
-  // Extract all unique tags
+  // Extract all unique tags used more than once to avoid cluttering the filter list
   const allTags = useMemo(() => {
-    const tags = new Set<string>();
+    const tagCounts: { [key: string]: number } = {};
     allEntries.forEach(e => {
       const entryTags = [...(e.tags || []), ...(e.analysis?.tags || [])]
         .map(t => typeof t === 'string' ? t.trim() : '')
         .filter(t => t.length > 0 && t.length <= 25);
       
       // Limit to max 10 tags per entry to prevent layout explosion from faulty AI runs
-      entryTags.slice(0, 10).forEach(t => tags.add(t));
+      const uniqueEntryTags = Array.from(new Set(entryTags.slice(0, 10)));
+      uniqueEntryTags.forEach(t => {
+        tagCounts[t] = (tagCounts[t] || 0) + 1;
+      });
     });
-    return Array.from(tags).sort();
+    // Filter to only return tags used more than once
+    return Object.keys(tagCounts)
+      .filter(t => tagCounts[t] > 1)
+      .sort();
   }, [allEntries]);
 
   const filteredEntries = useMemo(() => {
@@ -148,13 +163,13 @@ export default function SearchEntries({ entries, onSelectEntry }: SearchEntriesP
           >
             <div className="flex justify-between items-start mb-2">
               <h4 className="text-lg text-white font-medium group-hover:text-neon-cyan transition-colors">
-                {entry.title || format(parseISO(entry.date), 'MMMM d, yyyy')}
+                {format(parseISO(entry.date), 'MMMM d, yyyy')}
               </h4>
               <span className="text-xs text-baby-blue/40">{entry.date}</span>
             </div>
             
             <p className="text-sm text-baby-blue/70 line-clamp-2 mb-3">
-              {entry.content.replace(/<[^>]*>/g, '') || "No content"}
+              {cleanContentPreview(entry.content)}
             </p>
             
             <div className="flex items-center justify-between">

@@ -155,6 +155,7 @@ body {
   outline: none;
   min-height: 60vh;
   white-space: pre-wrap !important;
+  font-size: 16px !important;
 }
 
 .ProseMirror img {
@@ -172,6 +173,16 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.ProseMirror ul ul {
+  list-style-type: circle !important;
+  padding-left: 1.5rem !important;
+}
+
+.ProseMirror ul ul ul {
+  list-style-type: square !important;
+  padding-left: 1.5rem !important;
+}
+
 .ProseMirror ol {
   list-style-type: decimal !important;
   padding-left: 2rem !important;
@@ -179,8 +190,28 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.ProseMirror ol ol {
+  padding-left: 1.5rem !important;
+}
+
 .ProseMirror li {
   display: list-item;
+}
+
+/* Bullet & numbering marker colors by theme */
+.theme-amoled .ProseMirror ul li::marker,
+.theme-amoled .ProseMirror ol li::marker {
+  color: var(--neon-cyan-color) !important;
+}
+
+.theme-dusk .ProseMirror ul li::marker,
+.theme-dusk .ProseMirror ol li::marker {
+  color: #ff007f !important;
+}
+
+.theme-light .ProseMirror ul li::marker,
+.theme-light .ProseMirror ol li::marker {
+  color: var(--neon-cyan-color) !important;
 }
 
 .ProseMirror li p {
@@ -191,18 +222,82 @@ body {
 .ProseMirror ul[data-type="taskList"] {
   list-style: none !important;
   padding: 0 !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .ProseMirror ul[data-type="taskList"] li {
   display: flex !important;
-  align-items: flex-start;
+  align-items: flex-start !important;
+  margin-bottom: 0.5rem;
+  position: relative;
 }
 
+/* Hide the native checkbox input */
+.ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Custom circular checkbox label container */
 .ProseMirror ul[data-type="taskList"] li > label {
-  margin-right: 0.5rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 9999px !important;
+  border: 1.5px solid currentColor;
+  margin-right: 0.75rem !important;
+  margin-top: 0.22rem !important;
   cursor: pointer;
+  user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  background-color: transparent;
 }
 
+/* Theme specific border colors */
+.theme-amoled .ProseMirror ul[data-type="taskList"] li > label {
+  color: var(--neon-cyan-color) !important;
+}
+
+.theme-dusk .ProseMirror ul[data-type="taskList"] li > label {
+  color: #ff007f !important;
+}
+
+.theme-light .ProseMirror ul[data-type="taskList"] li > label {
+  color: var(--neon-cyan-color) !important;
+}
+
+/* Custom filled state when checked */
+.theme-amoled .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > label {
+  background-color: var(--neon-cyan-color) !important;
+  border-color: var(--neon-cyan-color) !important;
+}
+
+.theme-dusk .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > label {
+  background-color: #ff007f !important;
+  border-color: #ff007f !important;
+}
+
+.theme-light .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > label {
+  background-color: var(--neon-cyan-color) !important;
+  border-color: var(--neon-cyan-color) !important;
+}
+
+/* Dim text when Done */
+.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div,
+.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > p,
+.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > span {
+  opacity: 0.45 !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
@@ -213,13 +308,57 @@ body {
 }
 
 hr, .ProseMirror hr {
-  margin: 2.5rem 0;
-  border: none;
-  height: 6px;
-  width: 100%;
-  background: linear-gradient(90deg, transparent 0%, var(--neon-cyan-color) 25%, var(--neon-purple-color) 50%, var(--neon-pink-color) 75%, transparent 100%);
-  clip-path: ellipse(50% 50% at 50% 50%);
-  opacity: 0.95;
+  position: relative !important;
+  margin: 2.5rem 0 !important;
+  border: none !important;
+  height: 14px !important;
+  width: 100% !important;
+  background: transparent !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+hr::before, .ProseMirror hr::before {
+  content: "" !important;
+  display: block !important;
+  height: 2px !important;
+  width: 100% !important;
+  background: linear-gradient(90deg, transparent 0%, var(--neon-cyan-color) 25%, var(--neon-purple-color) 50%, var(--neon-pink-color) 75%, transparent 100%) !important;
+  clip-path: ellipse(50% 50% at 50% 50%) !important;
+  opacity: 0.95 !important;
+}
+
+hr::after, .ProseMirror hr::after {
+  content: "◆  ◆  ◆" !important;
+  display: block !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+  margin-top: 4px !important;
+  margin-left: 2px !important;
+  letter-spacing: 4px !important;
+  opacity: 0.95 !important;
+}
+
+/* Theme specific colors for horizontal rule diamonds */
+.theme-amoled hr::after,
+.theme-amoled .ProseMirror hr::after {
+  color: #ff0055 !important;
+  text-shadow: 0 0 6px rgba(255, 0, 85, 0.8) !important;
+}
+
+.theme-dusk hr::after,
+.theme-dusk .ProseMirror hr::after {
+  color: #ff007f !important;
+  text-shadow: 0 0 6px rgba(255, 0, 127, 0.8) !important;
+}
+
+.theme-light hr::after,
+.theme-light .ProseMirror hr::after {
+  color: #db2777 !important;
+  text-shadow: 0 0 4px rgba(219, 39, 119, 0.4) !important;
 }
 
 /* Light Mode Overrides for Hardcoded Text-White & Dark Classes */

@@ -99,10 +99,9 @@ export const MOOD_EMOJIS: Record<string, string> = {
 export const getMoodScore = (mood: string): number => {
   if (!mood) return 7;
   const normalized = mood.trim().toLowerCase();
-  if (normalized.includes('love')) return 12;
-  if (normalized.includes('happ')) return 11;
-  if (normalized.includes('excit')) return 10;
-  if (normalized.includes('product')) return 9;
+  if (normalized.includes('love')) return 11;
+  if (normalized.includes('happ')) return 10;
+  if (normalized.includes('excit')) return 9;
   if (normalized.includes('peace')) return 8;
   if (normalized.includes('okay') || normalized === 'meh' || normalized === 'neutral') return 7;
   if (normalized.includes('tire') || normalized.includes('sick')) return 6;

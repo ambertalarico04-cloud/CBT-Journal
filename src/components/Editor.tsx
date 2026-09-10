@@ -30,7 +30,7 @@ declare module '@tiptap/core' {
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, 
   Type, Palette, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  List, ListOrdered, CheckSquare, Minus, Save, Image as ImageIcon,
+  List, ListOrdered, CheckSquare, Minus, Plus, Save, Image as ImageIcon,
   Indent, Outdent, Mic, Loader2, Square, Sparkles, X, Volume2, Circle, Check, RotateCcw,
   Trash2, Download, Superscript, Subscript
 } from 'lucide-react';
@@ -45,9 +45,21 @@ const TabKeyExtension = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: () => {
+        if (this.editor.can().sinkListItem('listItem')) {
+          return this.editor.commands.sinkListItem('listItem');
+        }
+        if (this.editor.can().sinkListItem('taskItem')) {
+          return this.editor.commands.sinkListItem('taskItem');
+        }
         return this.editor.commands.insertContent('\u00A0\u00A0\u00A0\u00A0\u00A0');
       },
       'Shift-Tab': () => {
+        if (this.editor.can().liftListItem('listItem')) {
+          return this.editor.commands.liftListItem('listItem');
+        }
+        if (this.editor.can().liftListItem('taskItem')) {
+          return this.editor.commands.liftListItem('taskItem');
+        }
         return true;
       }
     };
@@ -154,6 +166,9 @@ const IndentExtension = Extension.create({
 });
 
 interface EditorProps {
+  title?: string;
+  onTitleChange?: (title: string) => void;
+  theme?: 'amoled' | 'light' | 'dusk';
   content: string;
   onChange: (content: string) => void;
   onExport: (format: 'txt' | 'pdf' | 'docx' | 'html') => void;
@@ -163,7 +178,7 @@ interface EditorProps {
   onAlert?: (title: string, message: string) => void;
 }
 
-export default function Editor({ content, onChange, onExport, onSave, onDelete, fonts, onAlert }: EditorProps) {
+export default function Editor({ title, onTitleChange, theme = 'amoled', content, onChange, onExport, onSave, onDelete, fonts, onAlert }: EditorProps) {
   const [showExportOptions, setShowExportOptions] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -258,7 +273,7 @@ export default function Editor({ content, onChange, onExport, onSave, onDelete, 
         animationRef.current = requestAnimationFrame(updateVisualizer);
       };
       
-      mediaRecorder.start(250);
+      mediaRecorder.start();
       setIsGeminiRecording(true);
       updateVisualizer();
 
@@ -621,23 +636,50 @@ export default function Editor({ content, onChange, onExport, onSave, onDelete, 
           ))}
         </select>
 
-        <select
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val) {
-              editor.chain().focus().setFontSize(val).run();
-            } else {
-              editor.chain().focus().unsetFontSize().run();
-            }
-          }}
-          className="bg-transparent text-sm border-none focus:ring-0 text-baby-blue/80 hover:text-white transition-colors cursor-pointer w-20"
-        >
-          <option value="" style={{ backgroundColor: 'var(--bg-secondary)' }}>Size</option>
-          <option value="12px" style={{ backgroundColor: 'var(--bg-secondary)' }}>Small</option>
-          <option value="16px" style={{ backgroundColor: 'var(--bg-secondary)' }}>Normal</option>
-          <option value="24px" style={{ backgroundColor: 'var(--bg-secondary)' }}>Large</option>
-          <option value="32px" style={{ backgroundColor: 'var(--bg-secondary)' }}>Huge</option>
-        </select>
+        <div className="flex items-center gap-1 bg-white/5 rounded-md p-0.5 border border-white/10 select-none">
+          <button
+            type="button"
+            onClick={() => {
+              const currentSize = (() => {
+                const sizeAttr = editor.getAttributes('textStyle').fontSize;
+                if (!sizeAttr) return 16;
+                const num = parseInt(sizeAttr, 10);
+                return isNaN(num) ? 16 : num;
+              })();
+              const newSize = Math.max(8, currentSize - 1);
+              editor.chain().focus().setFontSize(`${newSize}px`).run();
+            }}
+            className="p-1 rounded hover:bg-white/10 text-baby-blue/80 hover:text-white transition-colors"
+            title="Decrease Text Size"
+          >
+            <Minus size={12} />
+          </button>
+          <span className="text-xs font-mono font-bold text-baby-blue/90 px-1.5 min-w-[20px] text-center">
+            {(() => {
+              const sizeAttr = editor.getAttributes('textStyle').fontSize;
+              if (!sizeAttr) return 16;
+              const num = parseInt(sizeAttr, 10);
+              return isNaN(num) ? 16 : num;
+            })()}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const currentSize = (() => {
+                const sizeAttr = editor.getAttributes('textStyle').fontSize;
+                if (!sizeAttr) return 16;
+                const num = parseInt(sizeAttr, 10);
+                return isNaN(num) ? 16 : num;
+              })();
+              const newSize = Math.min(72, currentSize + 1);
+              editor.chain().focus().setFontSize(`${newSize}px`).run();
+            }}
+            className="p-1 rounded hover:bg-white/10 text-baby-blue/80 hover:text-white transition-colors"
+            title="Increase Text Size"
+          >
+            <Plus size={12} />
+          </button>
+        </div>
 
         <div className="w-px h-6 bg-white/10 mx-1" />
 

@@ -174,7 +174,7 @@ async function startServer() {
   app.post("/api/transcribe", async (req, res) => {
     try {
       const { audio, mimeType } = req.body;
-      const model = "gemini-2.5-flash";
+      const model = "gemini-3.5-transcribe";
 
       const response = await generateContentWithFallback({
         model: model,

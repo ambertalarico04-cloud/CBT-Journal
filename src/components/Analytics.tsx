@@ -38,15 +38,50 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
 
   // Process Mood Trend Chronologically (Last 30 Days)
   const moodTrendData = useMemo(() => {
-    return last30Days.map(date => {
+    const rawData = last30Days.map(date => {
       const entry = entries.find(e => e.date === date);
       return {
         date: format(parseISO(date), 'MMM d'),
         score: entry ? getMoodScore(entry.mood) : null,
         mood: entry ? entry.mood : null,
-        rawDate: date
+        rawDate: date,
+        isInterpolated: !entry
       };
     });
+
+    const interpolatedData = [...rawData];
+    for (let i = 0; i < interpolatedData.length; i++) {
+      if (interpolatedData[i].score === null) {
+        let prevIdx = -1;
+        for (let j = i - 1; j >= 0; j--) {
+          if (rawData[j].score !== null) {
+            prevIdx = j;
+            break;
+          }
+        }
+        let nextIdx = -1;
+        for (let j = i + 1; j < rawData.length; j++) {
+          if (rawData[j].score !== null) {
+            nextIdx = j;
+            break;
+          }
+        }
+
+        if (prevIdx !== -1 && nextIdx !== -1) {
+          const prevScore = rawData[prevIdx].score!;
+          const nextScore = rawData[nextIdx].score!;
+          const fraction = (i - prevIdx) / (nextIdx - prevIdx);
+          interpolatedData[i].score = prevScore + (nextScore - prevScore) * fraction;
+        } else if (prevIdx !== -1) {
+          interpolatedData[i].score = rawData[prevIdx].score;
+        } else if (nextIdx !== -1) {
+          interpolatedData[i].score = rawData[nextIdx].score;
+        } else {
+          interpolatedData[i].score = null;
+        }
+      }
+    }
+    return interpolatedData;
   }, [entries, last30Days]);
 
   const HABIT_NEON_COLORS: Record<string, string> = {
@@ -261,16 +296,16 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                   axisLine={false}
                 />
                 <YAxis 
-                  domain={[1, 12]}
-                  ticks={[1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12]}
+                  domain={[1, 11]}
+                  ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}
                   stroke={isLight ? "rgba(15, 23, 42, 0.15)" : "#ffffff20"} 
                   tick={{ fill: isLight ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.85)', fontSize: 10, fontWeight: 600 }}
                   tickLine={false} 
                   axisLine={false} 
                   tickFormatter={(score) => {
-                    if (score === 12) return '😍 In love';
-                    if (score === 11) return '😊 Happy';
-                    if (score === 10) return '🤩 Excited';
+                    if (score === 11) return '😍 In love';
+                    if (score === 10) return '😊 Happy';
+                    if (score === 9) return '🤩 Excited';
                     if (score === 8) return '😌 Peaceful';
                     if (score === 7) return '🙂 Okay';
                     if (score === 6) return '😴 Tired';
@@ -283,11 +318,11 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                   }}
                   width={110}
                 />
-                <Tooltip 
+                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
-                      if (data.score === null) return null;
+                      if (data.score === null || data.isInterpolated) return null;
                       const emoji = getMoodEmoji(data.mood || '');
                       return (
                         <div className={`p-3 rounded-xl shadow-2xl backdrop-blur-md border ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-black/90 border-white/10 text-white'}`}>
@@ -296,7 +331,7 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                             <span>{emoji}</span>
                             <span>{data.mood}</span>
                           </p>
-                          <p className={`text-[10px] mt-1 uppercase tracking-widest font-bold ${isLight ? 'text-pink-600' : 'text-neon-pink'}`}>Score: {data.score}/12</p>
+                          <p className={`text-[10px] mt-1 uppercase tracking-widest font-bold ${isLight ? 'text-pink-600' : 'text-neon-pink'}`}>Score: {data.score}/11</p>
                         </div>
                       );
                     }
@@ -308,8 +343,33 @@ export default function Analytics({ entries, habits, profile, onAlert }: Analyti
                   dataKey="score" 
                   stroke="#ff007f" 
                   strokeWidth={2.5} 
-                  dot={{ r: 3, fill: '#ff007f', stroke: '#000', strokeWidth: 1 }}
-                  activeDot={{ r: 5, fill: '#00f0ff', stroke: '#fff', strokeWidth: 2 }}
+                  dot={(props: any) => {
+                    if (props.payload.isInterpolated) return <></>;
+                    return (
+                      <circle 
+                        key={props.key || `dot-${props.cx}-${props.cy}`}
+                        cx={props.cx} 
+                        cy={props.cy} 
+                        r={3} 
+                        fill="#ff007f" 
+                        stroke="#000" 
+                        strokeWidth={1} 
+                      />
+                    );
+                  }}
+                  activeDot={(props: any) => {
+                    if (props.payload.isInterpolated) return <></>;
+                    return (
+                      <circle 
+                        cx={props.cx} 
+                        cy={props.cy} 
+                        r={5} 
+                        fill="#00f0ff" 
+                        stroke="#fff" 
+                        strokeWidth={2} 
+                      />
+                    );
+                  }}
                   connectNulls={true}
                 />
               </LineChart>

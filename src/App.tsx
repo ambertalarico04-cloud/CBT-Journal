@@ -459,14 +459,20 @@ function AppContent() {
         currentY += 12;
       }
 
-      // Title
+      // Title as Header 1 (H1)
       if (currentEntry.title) {
-        addPageIfNeeded(12);
-        doc.setTextColor(pdfTheme.text[0], pdfTheme.text[1], pdfTheme.text[2]);
+        addPageIfNeeded(15);
+        if (isLight) {
+          doc.setTextColor(0, 0, 0); // Black for Light theme
+        } else if (isDusk) {
+          doc.setTextColor(201, 169, 233); // #C9A9E9 Dusty Pink/Glow for Dusk theme
+        } else {
+          doc.setTextColor(56, 189, 248); // #38BDF8 Aurora blue-cyan start for AMOLED theme
+        }
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
+        doc.setFontSize(18); // Header 1 size
         doc.text(currentEntry.title, 15, currentY);
-        currentY += 8;
+        currentY += 10;
       }
 
       // Journal Content (wrapped lines with sleek left border)
@@ -855,7 +861,7 @@ function AppContent() {
       </div>
       ` : '';
 
-      const titleSection = currentEntry.title ? `<div class="journal-title">${currentEntry.title}</div>` : '';
+      const titleSection = currentEntry.title ? `<h1 class="journal-title">${currentEntry.title}</h1>` : '';
 
       let analysisSection = '';
       if (currentEntry.analysis) {
@@ -1043,12 +1049,28 @@ function AppContent() {
       margin-bottom: 3rem;
     }
     .journal-title {
-      font-size: 1.5rem;
-      font-weight: 300;
-      color: var(--text-primary);
+      font-family: 'Poiret One', sans-serif;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-align: center;
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
+      padding-bottom: 1.5rem;
+      ${isLight ? `
+        color: #000000;
+      ` : isDusk ? `
+        background: linear-gradient(135deg, #C9A9E9 0%, #E8A4B8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+        width: 100%;
+      ` : `
+        background: linear-gradient(180deg, #38BDF8 0%, #A855F7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+        width: 100%;
+      `}
     }
     .journal-body {
       line-height: 1.8;
@@ -1079,11 +1101,37 @@ function AppContent() {
     }
     
     .divider {
-      height: 6px;
+      position: relative;
+      height: 14px;
+      width: 100%;
+      background: transparent !important;
+      margin: 4rem 0;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    
+    .divider::before {
+      content: "";
+      display: block;
+      height: 2px;
       width: 100%;
       background: ${isLight ? 'linear-gradient(90deg, transparent 0%, #db2777 25%, #7c3aed 50%, #0f766e 75%, transparent 100%)' : isDusk ? 'linear-gradient(90deg, transparent 0%, #C9A9E9 25%, #E8A4B8 50%, #C9A9E9 75%, transparent 100%)' : 'linear-gradient(90deg, transparent 0%, #00CFFF 25%, #A855F7 50%, #FF007F 75%, transparent 100%)'};
       clip-path: ellipse(50% 50% at 50% 50%);
-      margin: 4rem 0;
+    }
+    
+    .divider::after {
+      content: "◆  ◆  ◆";
+      display: block;
+      font-size: 8px;
+      line-height: 1;
+      margin-top: 4px;
+      margin-left: 2px;
+      letter-spacing: 4px;
+      color: ${isLight ? '#db2777' : isDusk ? '#ff007f' : '#ff0055'};
+      text-shadow: ${isLight ? '0 0 4px rgba(219, 39, 119, 0.4)' : isDusk ? '0 0 6px rgba(255, 0, 127, 0.8)' : '0 0 6px rgba(255, 0, 85, 0.8)'};
     }
     .analysis-card {
       background: var(--bg-analysis);
@@ -1327,34 +1375,73 @@ function AppContent() {
                     key="entry"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="space-y-6"
+                    className="flex flex-col w-full"
                   >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <h2 
-                          className={`text-3xl font-poiret uppercase tracking-widest ${isLight ? 'text-slate-900 font-bold' : isDusk ? 'text-[#ff6b9d] neon-glow-pink font-light' : 'text-neon-cyan neon-glow-blue font-bold'}`} 
-                          style={{ 
-                            fontSize: '30px' 
-                          }}
-                        >
-                          {format(selectedDate, 'MMMM d, yyyy')}
-                        </h2>
+                    {/* Date Header */}
+                    <div className="mb-0">
+                      <h2 
+                        className={`font-poiret uppercase tracking-widest ${isLight ? 'text-slate-900 font-bold' : isDusk ? 'text-[#ff6b9d] neon-glow-pink font-light' : 'text-neon-cyan neon-glow-blue font-bold'}`} 
+                        style={{ fontSize: '32px', lineHeight: '1' }}
+                      >
+                        {format(selectedDate, 'MMMM d, yyyy')}
+                      </h2>
+                    </div>
+
+                    {/* Inline Title input bar with Tags and Mood at the end */}
+                    <div className="flex items-end justify-between w-full mb-[2px] gap-4">
+                      <div className="flex items-baseline gap-3 flex-grow border-b pb-0 transition-all"
+                           style={{ 
+                             borderBottomColor: isLight ? '#e2e8f0' : isDusk ? 'rgba(236, 72, 153, 0.2)' : 'rgba(0, 255, 255, 0.2)' 
+                           }}>
                         <div 
-                          className="flex items-center gap-2 text-xs uppercase tracking-widest" 
+                          className="uppercase tracking-widest font-bold font-poiret shrink-0 select-none text-baby-blue/40"
                           style={{ 
-                            color: isLight ? '#475569' : 'rgba(255, 255, 255, 0.4)', 
-                            fontFamily: 'Poiret One', 
-                            fontWeight: 'bold' 
+                            fontSize: '11px',
+                            letterSpacing: '0.25em',
+                            marginBottom: '4px'
                           }}
                         >
-                          <Book size={12} />
                           Journal Entry
                         </div>
+                        
+                        <input
+                          type="text"
+                          value={currentEntry.title || ''}
+                          onChange={async (e) => {
+                            await saveEntryFields({ title: e.target.value });
+                          }}
+                          placeholder="An Aurora Gradient Title in Poiret One"
+                          style={{
+                            fontFamily: "'Poiret One', sans-serif",
+                            background: isLight 
+                              ? 'none' 
+                              : isDusk 
+                                ? 'linear-gradient(90deg, #C9A9E9 0%, #E8A4B8 100%)' 
+                                : 'linear-gradient(90deg, #38BDF8 0%, #A855F7 100%)',
+                            WebkitBackgroundClip: isLight ? 'unset' : 'text',
+                            WebkitTextFillColor: isLight ? 'unset' : 'transparent',
+                            color: isLight ? '#000000' : 'transparent',
+                            fontSize: '30px',
+                            fontWeight: 'normal',
+                            lineHeight: '1',
+                            padding: '0 0 2px 0',
+                            margin: '0',
+                          }}
+                          className={`flex-grow bg-transparent focus:outline-none transition-all ${
+                            isLight
+                              ? 'placeholder-slate-300'
+                              : isDusk
+                                ? 'placeholder-pink-300/20'
+                                : 'placeholder-neon-cyan/20'
+                          }`}
+                        />
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 bg-white/5 p-2 rounded-2xl border border-white/5">
-                          <span className="text-[10px] font-bold text-baby-blue/40 uppercase tracking-widest pl-2">Tags</span>
+                      {/* Tags & Mood Capsules */}
+                      <div className="flex items-center gap-2 shrink-0 mb-[1px]">
+                        {/* Tags Capsule */}
+                        <div className="flex items-center gap-1.5 bg-white/5 p-1 px-3 rounded-full border border-white/5">
+                          <span className="text-[9px] font-bold text-baby-blue/40 uppercase tracking-widest">Tags</span>
                           <input 
                             type="text" 
                             placeholder="Add tag"
@@ -1373,7 +1460,7 @@ function AppContent() {
                                 }
                               }
                             }}
-                            className="bg-transparent text-sm border-none focus:ring-0 text-white w-28 placeholder:text-white/20"
+                            className="bg-transparent text-[11px] border-none focus:ring-0 text-white w-16 placeholder:text-white/20 p-0"
                           />
                           <button
                             type="button"
@@ -1387,18 +1474,20 @@ function AppContent() {
                                 setTagInput('');
                               }
                             }}
-                            className="p-1 text-neon-cyan hover:text-white hover:bg-white/10 rounded-lg transition-colors mr-1 cursor-pointer flex items-center justify-center"
+                            className="text-neon-cyan hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                             title="Add Tag"
                           >
-                            <Plus size={16} />
+                            <Plus size={12} />
                           </button>
                         </div>
-                        <div className="flex items-center gap-2 bg-white/5 p-2 rounded-2xl border border-white/5">
-                          <span className="text-[10px] font-bold text-baby-blue/40 uppercase tracking-widest pl-2">Mood</span>
+
+                        {/* Mood Capsule */}
+                        <div className="flex items-center gap-2 bg-white/5 p-1 px-3 rounded-full border border-white/5">
+                          <span className="text-[9px] font-bold text-baby-blue/40 uppercase tracking-widest">Mood</span>
                           <select 
                             value={currentEntry.mood || ''}
                             onChange={(e) => handleMoodUpdate(e.target.value)}
-                            className="bg-transparent text-sm border-none focus:ring-0 text-white cursor-pointer"
+                            className="bg-transparent text-[11px] border-none focus:ring-0 text-white cursor-pointer p-0 appearance-none"
                           >
                             <option value="" style={{ backgroundColor: 'var(--bg-secondary)' }}>Choose...</option>
                             {MOOD_OPTIONS.map(m => {
@@ -1415,9 +1504,9 @@ function AppContent() {
                     </div>
                     
                     {(currentEntry.tags || []).length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-1">
                         {(currentEntry.tags || []).map((tag, i) => (
-                          <span key={i} className="flex items-center gap-1 px-2 py-1 bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan text-[10px] rounded-lg tracking-wider uppercase font-bold">
+                          <span key={i} className="flex items-center gap-1 px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan text-[9px] rounded-lg tracking-wider uppercase font-bold">
                             #{tag}
                             <button 
                               onClick={async () => {
@@ -1436,6 +1525,7 @@ function AppContent() {
 
                     <Editor 
                       key={dateStr}
+                      theme={profile?.theme || 'amoled'}
                       content={currentEntry.content} 
                       onChange={handleEntryUpdate}
                       onExport={exportEntry}
@@ -1530,11 +1620,11 @@ function AppContent() {
                          <div className="flex flex-col gap-3 pb-2">
                            <div className="flex items-center gap-3 text-neon-pink">
                              <Sparkles size={24} className="neon-glow-pink" />
-                             <h3 className="text-xl tracking-widest uppercase">Psychological Readout</h3>
+                             <h3 className="text-2xl tracking-widest uppercase font-poiret font-bold">Psychological Readout</h3>
                            </div>
                            {/* Custom neon gradient divider, thicker in the middle and thinner at the ends */}
-                           <div className="relative w-full h-[6px] flex items-center justify-center my-1 z-10">
-                             <svg className="w-full h-full" viewBox="0 0 100 6" preserveAspectRatio="none">
+                           <div className="relative w-full h-[2px] flex items-center justify-center my-1 z-10">
+                             <svg className="w-full h-full" viewBox="0 0 100 2" preserveAspectRatio="none">
                                <defs>
                                  <linearGradient 
                                       id="neonDividerGrad" 
@@ -1570,11 +1660,11 @@ function AppContent() {
                                       )}
                                    </linearGradient>
                                </defs>
-                               <path d="M 0 3 Q 50 0, 100 3 Q 50 6, 0 3" fill="url(#neonDividerGrad)" />
+                               <path d="M 0 1 Q 50 0, 100 1 Q 50 2, 0 1" fill="url(#neonDividerGrad)" />
                              </svg>
                            </div>
                          </div>
-
+ 
                          {/* Crisis Safety Note */}
                          {currentEntry.analysis.crisisMessage && (
                            <motion.div 
@@ -1583,7 +1673,7 @@ function AppContent() {
                              className="p-4 bg-red-950/40 border border-red-500/50 rounded-xl flex gap-3 text-red-200"
                            >
                              <AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5 animate-pulse" />
-                             <div className="text-xs space-y-1">
+                             <div className="text-sm space-y-1">
                                <span className="font-bold uppercase tracking-wider text-red-400">Immediate Support & Safety Notice</span>
                                <p className="leading-relaxed">{currentEntry.analysis.crisisMessage}</p>
                              </div>
@@ -1593,19 +1683,19 @@ function AppContent() {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                            <div className="space-y-4">
                              <div className="space-y-1">
-                               <h4 className="text-[10px] text-baby-blue/40 uppercase font-bold tracking-widest">Atmosphere Summary</h4>
-                               <p className="text-sm leading-relaxed text-[var(--text-primary)]/80 italic">"{currentEntry.analysis.moodSummary}"</p>
+                               <h4 className="text-xs text-baby-blue/40 uppercase font-bold tracking-widest">Atmosphere Summary</h4>
+                               <p className="text-base leading-relaxed text-[var(--text-primary)]/80 italic">"{currentEntry.analysis.moodSummary}"</p>
                              </div>
                              
                              {/* Optional Safety Note */}
                              {currentEntry.analysis.safetyNote && (
-                               <div className="text-[10px] text-baby-blue/40 leading-relaxed font-sans italic border-t border-white/5 pt-2">
+                               <div className="text-xs text-baby-blue/40 leading-relaxed font-sans italic border-t border-white/5 pt-2">
                                  {currentEntry.analysis.safetyNote}
                                </div>
                              )}
-
+ 
                              <div className="space-y-1">
-                               <h4 className="text-[10px] text-baby-blue/40 uppercase font-bold tracking-widest">AI Suggested Tags</h4>
+                               <h4 className="text-xs text-baby-blue/40 uppercase font-bold tracking-widest">AI Suggested Tags</h4>
                                <div className="flex flex-wrap gap-2 pt-1">
                                  {currentEntry.analysis.tags?.map((t: string, i: number) => (
                                    <button 
@@ -1617,7 +1707,7 @@ function AppContent() {
                                        }
                                      }}
                                       disabled={(currentEntry.tags || []).includes(t)}
-                                      className={`px-2 py-1 bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan text-[10px] rounded-lg tracking-wider uppercase font-bold transition-all ${(currentEntry.tags || []).includes(t) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neon-cyan/20 hover:scale-105 cursor-pointer'}`}
+                                      className={`px-2 py-1 bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan text-xs rounded-lg tracking-wider uppercase font-bold transition-all ${(currentEntry.tags || []).includes(t) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neon-cyan/20 hover:scale-105 cursor-pointer'}`}
                                    >
                                      #{t}
                                    </button>
@@ -1629,10 +1719,10 @@ function AppContent() {
                            {/* Key Themes & Patterns (If new structure exists) */}
                            {currentEntry.analysis.keyThemes && currentEntry.analysis.keyThemes.length > 0 ? (
                              <div className="space-y-3">
-                               <h4 className="text-[10px] text-baby-blue/40 uppercase font-bold tracking-widest">Key Themes & Patterns</h4>
+                               <h4 className="text-xs text-baby-blue/40 uppercase font-bold tracking-widest">Key Themes & Patterns</h4>
                                <ul className="space-y-3">
                                  {currentEntry.analysis.keyThemes.map((theme: string, i: number) => (
-                                   <li key={i} className="flex gap-3 text-xs leading-relaxed text-[var(--text-primary)]/80 border-l border-neon-cyan/30 pl-4 py-1">
+                                   <li key={i} className="flex gap-3 text-sm leading-relaxed text-[var(--text-primary)]/80 border-l border-neon-cyan/30 pl-4 py-1">
                                      <ChevronRight size={14} className="text-neon-cyan mt-0.5 shrink-0" />
                                      {theme}
                                    </li>
@@ -1642,10 +1732,10 @@ function AppContent() {
                            ) : (
                              // Legacy: Identified Cognitive Trends
                              <div className="space-y-3">
-                               <h4 className="text-[10px] text-baby-blue/40 uppercase font-bold tracking-widest">Identified Cognitive Trends</h4>
+                               <h4 className="text-xs text-baby-blue/40 uppercase font-bold tracking-widest">Identified Cognitive Trends</h4>
                                <ul className="space-y-3">
                                  {(currentEntry.analysis.insights || []).map((insight: string, i: number) => (
-                                   <li key={i} className="flex gap-3 text-xs leading-relaxed text-[var(--text-primary)]/80 border-l border-white/10 pl-4 py-1">
+                                   <li key={i} className="flex gap-3 text-sm leading-relaxed text-[var(--text-primary)]/80 border-l border-white/10 pl-4 py-1">
                                      <ChevronRight size={14} className="text-neon-purple mt-0.5 shrink-0" />
                                      {insight}
                                    </li>
@@ -1654,78 +1744,78 @@ function AppContent() {
                              </div>
                            )}
                          </div>
-
+ 
                          {/* Cognitive Distortions Section */}
                          {currentEntry.analysis.cognitiveDistortions && (
                            <div className="p-4 bg-white/5 border border-white/5 rounded-xl space-y-2">
-                             <h4 className="text-[10px] text-neon-pink uppercase font-bold tracking-widest">Cognitive Distortions Identified</h4>
+                             <h4 className="text-xs text-neon-pink uppercase font-bold tracking-widest">Cognitive Distortions Identified</h4>
                              {currentEntry.analysis.cognitiveDistortions.length > 0 ? (
                                <div className="flex flex-wrap gap-2 pt-1">
                                  {currentEntry.analysis.cognitiveDistortions.map((distortion: string, i: number) => (
-                                   <span key={i} className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-full font-medium">
+                                   <span key={i} className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-full font-medium">
                                      ⚠️ {distortion}
                                    </span>
                                  ))}
                                </div>
                              ) : (
-                               <p className="text-xs text-baby-blue/60 italic">No cognitive distortions flagged in this entry.</p>
+                               <p className="text-sm text-baby-blue/60 italic">No cognitive distortions flagged in this entry.</p>
                              )}
                            </div>
                          )}
-
+ 
                          {/* Underlying Dynamics Section */}
                          {currentEntry.analysis.underlyingDynamics && currentEntry.analysis.underlyingDynamics.length > 0 && (
                            <div className="p-4 bg-white/5 border border-white/5 rounded-xl space-y-2">
-                             <h4 className="text-[10px] text-neon-purple uppercase font-bold tracking-widest">Underlying Dynamics & Conflicts (CBT Hypotheses)</h4>
+                             <h4 className="text-xs text-neon-purple uppercase font-bold tracking-widest">Underlying Dynamics & Conflicts (CBT Hypotheses)</h4>
                              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                {currentEntry.analysis.underlyingDynamics.map((dynamic: string, i: number) => (
-                                 <li key={i} className="text-xs text-[var(--text-primary)]/80 leading-relaxed bg-black/10 p-3 rounded-lg border border-white/5">
+                                 <li key={i} className="text-sm text-[var(--text-primary)]/80 leading-relaxed bg-black/10 p-3 rounded-lg border border-white/5">
                                    💡 {dynamic}
                                  </li>
                                ))}
                              </ul>
                            </div>
                          )}
-
+ 
                          {/* CBT Reframes & Alternative interpretations */}
                          {currentEntry.analysis.cbtReframes && currentEntry.analysis.cbtReframes.length > 0 && (
                            <div className="p-4 bg-white/5 border border-white/5 rounded-xl space-y-3">
-                             <h4 className="text-[10px] text-neon-pink uppercase font-bold tracking-widest">CBT Reframes & Alternative Perspectives</h4>
+                             <h4 className="text-xs text-neon-pink uppercase font-bold tracking-widest">CBT Reframes & Alternative Perspectives</h4>
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                {currentEntry.analysis.cbtReframes.map((reframe: string, i: number) => (
-                                 <div key={i} className="text-xs text-[var(--text-primary)]/80 leading-relaxed bg-neon-cyan/5 p-3 rounded-lg border border-neon-cyan/15 border-l-4 border-l-neon-cyan">
+                                 <div key={i} className="text-sm text-[var(--text-primary)]/80 leading-relaxed bg-neon-cyan/5 p-3 rounded-lg border border-neon-cyan/15 border-l-4 border-l-neon-cyan">
                                    🔄 {reframe}
                                  </div>
                                ))}
                              </div>
                            </div>
                          )}
-
+ 
                          {/* Reflection Questions Section */}
                          {currentEntry.analysis.reflectionQuestions && currentEntry.analysis.reflectionQuestions.length > 0 && (
                            <div className="p-4 bg-white/5 border border-white/5 rounded-xl space-y-2">
-                             <h4 className="text-[10px] text-neon-cyan uppercase font-bold tracking-widest">Clinician Observations & Reflection Questions</h4>
+                             <h4 className="text-xs text-neon-cyan uppercase font-bold tracking-widest">Clinician Observations & Reflection Questions</h4>
                              <ul className="space-y-2">
                                {currentEntry.analysis.reflectionQuestions.map((q: string, i: number) => (
-                                 <li key={i} className="text-xs text-[var(--text-primary)]/90 leading-relaxed bg-black/10 p-3 rounded-lg border border-white/5 font-serif italic">
+                                 <li key={i} className="text-sm text-[var(--text-primary)]/90 leading-relaxed bg-black/10 p-3 rounded-lg border border-white/5 font-serif italic">
                                    ❓ {q}
                                  </li>
                                ))}
                              </ul>
                            </div>
                          )}
-
+ 
                          {/* Watch for Pattern section */}
                          {currentEntry.analysis.watchPattern && (
                            <div className="p-4 bg-white/5 border border-white/5 rounded-xl space-y-1">
-                             <h4 className="text-[10px] text-neon-pink uppercase font-bold tracking-widest">Future Monitoring: Watch for This Pattern</h4>
-                             <p className="text-xs text-[var(--text-primary)]/80 leading-relaxed italic">{currentEntry.analysis.watchPattern}</p>
+                             <h4 className="text-xs text-neon-pink uppercase font-bold tracking-widest">Future Monitoring: Watch for This Pattern</h4>
+                             <p className="text-sm text-[var(--text-primary)]/80 leading-relaxed italic">{currentEntry.analysis.watchPattern}</p>
                            </div>
                          )}
                          
                          <div className="bg-white/5 p-6 rounded-2xl border border-white/5 border-l-4 border-l-neon-blue">
-                           <h4 className="text-[10px] text-neon-blue uppercase font-bold tracking-widest mb-2">Therapeutic Recommendation</h4>
-                           <p className="text-sm leading-relaxed font-light">{currentEntry.analysis.advice}</p>
+                           <h4 className="text-xs text-neon-blue uppercase font-bold tracking-widest mb-2">Therapeutic Recommendation</h4>
+                           <p className="text-base leading-relaxed font-light">{currentEntry.analysis.advice}</p>
                          </div>
                       </motion.div>
                     )}
@@ -1845,7 +1935,7 @@ function AppContent() {
 
             {/* Right Tabs Rail */}
             <div className="w-14 border-l border-[var(--border)] flex flex-col items-center py-6 gap-6 glass">
-              {(['entry', 'habits', 'search', 'analytics'] as const).map((tab) => {
+              {(['entry', 'habits', 'analytics', 'search'] as const).map((tab) => {
                 const isActive = activeTab === tab;
                 const label = tab === 'entry' ? 'JOURNAL' : tab === 'habits' ? 'DAILY GOALS' : tab === 'search' ? 'SEARCH' : 'ANALYTICS';
                 return (
